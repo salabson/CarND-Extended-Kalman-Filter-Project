@@ -28,7 +28,7 @@ void KalmanFilter::Predict() {
    * TODO: predict the state/prior state
    */
    x_ = F_*x_;
-   P_ = F_*P_*F_.transpose();
+   P_ = F_*P_*F_.transpose() + Q_;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
@@ -38,7 +38,7 @@ void KalmanFilter::Update(const VectorXd &z) {
    // Calculate measurement residual or error
    VectorXd y = z - (H_*x_);
    // Calculate Kalman filter denominator
-   MatrixXd s = H_*P_*H_.transpose();
+   MatrixXd s = H_*P_*H_.transpose() + R_;
    // Calculate Kalman gain
    MatrixXd K = P_*H_.transpose()*s.inverse();
   
@@ -53,12 +53,20 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
    * TODO: update the state by using Extended Kalman Filter equations
    */
-    // create jacobian matrix for linearizing radar measurement
     MatrixXd Hj(4,4);
+    
     float px = x_[0];
     float py = x_[1];
     float vx = x_[2];
     float vy = x_[3];
+
+    if(fabs(px*px+py*py) < 0.0001){
+	Hj = MatrixXd::Constant(4,4,0.0);
+	}
+	
+	
+
+    // create jacobian matrix for linearizing radar measurement
     Hj << px/sqrt(pow(px,2)+pow(py,2)), py/sqrt(pow(px,2)+pow(py,2)), 0, 0,
         -(py/(pow(px,2)+pow(py,2))),  px/(pow(px,2)+pow(py,2)),0,0,
         py*(vx*py-vy*px)/(pow(px,2)+pow(py,2),1.5), px*(vy*px-vx*py)/(pow(px,2)+pow(py,2),1.5), px/sqrt(pow(px,2)+pow(py,2)), py/sqrt(pow(px,2)+pow(py,2));
@@ -66,7 +74,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   // Calculate measurement residual or error
    VectorXd y = z - (Hj*x_);
    // Calculate Kalman filter denominator
-   MatrixXd s = H_*P_*H_.transpose();
+   MatrixXd s = H_*P_*H_.transpose() + R_;
    // Calculate Kalman gain
    MatrixXd K = P_*H_.transpose()*s.inverse();
   
