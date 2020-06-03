@@ -37,14 +37,14 @@ void KalmanFilter::Update(const VectorXd &z) {
    // Calculate measurement residual or error
    VectorXd y = z - (H_*x_);
    // Calculate Kalman filter denominator
-   MatrixXd s = H_*P*H_.transpose();
+   MatrixXd s = H_*P_*H_.transpose();
    // Calculate Kalman gain
    MatrixXd K = P_*H_.transpose()*s.inverse();
   
   // Calculate posterior or new state
-  I = MatrixXd::Identity(2, 2);
+  MatrixXd I = MatrixXd::Identity(2, 2);
   x_= x_ + K*y;
-  P_ = (I-K*H)*P;
+  P_ = (I-K*H_)*P_;
    
 }
 
