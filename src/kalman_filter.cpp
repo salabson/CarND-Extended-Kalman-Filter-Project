@@ -24,14 +24,28 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 
 void KalmanFilter::Predict() {
   /**
-   * TODO: predict the state
+   * TODO: predict the state/prior state
    */
+   x_ = F_*x_;
+   P_ = F_*P_*F_.transpose();
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
   /**
    * TODO: update the state by using Kalman Filter equations
    */
+   // Calculate measurement residual or error
+   VectorXd y = z - (H_*x_);
+   // Calculate Kalman filter denominator
+   MatrixXd s = H_*P*H_.transpose();
+   // Calculate Kalman gain
+   MatrixXd K = P_*H_.transpose()*s.inverse();
+  
+  // Calculate posterior or new state
+  I = MatrixXd::Identity(2, 2);
+  x_= x_ + K*y;
+  P_ = (I-K*H)*P;
+   
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
