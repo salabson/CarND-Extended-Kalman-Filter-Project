@@ -133,21 +133,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // TODO: Radar updates
     
-    // Read radar measurements
-    float px_r = measurement_pack.raw_measurements_[0];
-    float py_r = measurement_pack.raw_measurements_[1];
-    float vx_r = measurement_pack.raw_measurements_[2];
-    float vy_r = measurement_pack.raw_measurements_[3];
-  
-    // Check for division by zero
-    if(fabs(px_r*px_r+py_r*py_r) < 0.0001){
-	ekf_.Hj_ = MatrixXd::Constant(4,4,0.0);
-	}
-	
-    // create jacobian matrix for linearizing radar measurement
-    ekf_.Hj_ << px_r/sqrt(pow(px_r,2)+pow(py_r,2)), py_r/sqrt(pow(px_r,2)+pow(py_r,2)), 0, 0,
-        -(py_r/(pow(px_r,2)+pow(py_r,2))),  px_r/(pow(px_r,2)+pow(py_r,2)),0,0,
-        py_r*(vx_r*py_r-vy_r*px_r)/(pow(px_r,2)+pow(py_r,2),1.5), px_r*(vy_r*px_r-vx_r*py_r)/(pow(px_r,2)+pow(py_r,2),1.5), px_r/sqrt(pow(px_r,2)+pow(py_r,2)), py_r/sqrt(pow(px_r,2)+pow(py_r,2));
+    // initialize jacobian matrix
+    Hj_ = CalculateJacobian(measurement_pack.raw_measurements_)
+    ekf_.Hj_ = Hj_;
     
     // Update radar measurement covariance
     ekf_.R_ << R_radar_;
