@@ -2,8 +2,7 @@
 #include <iostream>
 #include "Eigen/Dense"
 #include "tools.h"
-#include "kalman_filter.h"
-#include "measurement_package.h"
+#include "cmath.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -38,7 +37,19 @@ FusionEKF::FusionEKF() {
    * TODO: Finish initializing the FusionEKF.
    * TODO: Set the process and measurement noises
    */
-	
+    ekf_.H_ = MatrixXd(2,4);
+    H_ << 1,0,0,0,
+          0,1,0,0;
+
+    ekf_.Q_ = MatrixXd(3,4);
+    ekf_F_ = MatrixXd(4,4);
+    ekf_.P_ = MatrixXd(2,2);
+    ekf_.R_ = MatrixXd(2,2);
+    
+   
+
+
+   
 
 
 }
@@ -58,24 +69,26 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * TODO: Create the covariance matrix.
      * You'll need to convert radar from polar to cartesian coordinates.
      */
-     
+
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
+    ekf_.x_ << 1, 1,1, 1;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       // TODO: Convert radar from polar to cartesian coordinates 
       //         and initialize state.
-	
-
+        float px = measurement_pack.raw_measurements_[0]*cos*measurement_pack.raw_measurements_[1];
+    	float py = emeasurement_pack.raw_measurements_[0]*sin*measurement_pack.raw_measurements_[1];
+    	float vx = measurement_pack.raw_measurements_[2]*cos*measurement_pack.raw_measurements_[1];
+    	float vy = measurement_pack.raw_measurements_[2]*sin*measurement_pack.raw_measurements_[1];
+	ekf_.x_ << px, py, vx, vy;
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       // TODO: Initialize state.
-      ekf_.x_ 
+      ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
 
     }
-
     // done initializing, no need to predict or update
     is_initialized_ = true;
     return;
