@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Eigen/Dense"
 #include "tools.h"
-#include "cmath.h>
+#include "cmath"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -38,11 +38,11 @@ FusionEKF::FusionEKF() {
    * TODO: Set the process and measurement noises
    */
     ekf_.H_ = MatrixXd(2,4);
-    H_ << 1,0,0,0,
+    ekf_.H_ << 1,0,0,0,
           0,1,0,0;
 
     ekf_.Q_ = MatrixXd(3,4);
-    ekf_F_ = MatrixXd(4,4);
+    ekf_.F_ = MatrixXd(4,4);
     ekf_.P_ = MatrixXd(2,2);
     ekf_.R_ = MatrixXd(2,2);
     
@@ -79,7 +79,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       // TODO: Convert radar from polar to cartesian coordinates 
       //         and initialize state.
         float px = measurement_pack.raw_measurements_[0]*cos*measurement_pack.raw_measurements_[1];
-    	float py = emeasurement_pack.raw_measurements_[0]*sin*measurement_pack.raw_measurements_[1];
+    	float py = measurement_pack.raw_measurements_[0]*sin*measurement_pack.raw_measurements_[1];
     	float vx = measurement_pack.raw_measurements_[2]*cos*measurement_pack.raw_measurements_[1];
     	float vy = measurement_pack.raw_measurements_[2]*sin*measurement_pack.raw_measurements_[1];
 	ekf_.x_ << px, py, vx, vy;
