@@ -41,10 +41,9 @@ FusionEKF::FusionEKF() {
     ekf_.H_ << 1,0,0,0,
           0,1,0,0;
 
-    ekf_.Q_ = MatrixXd(3,4);
+    ekf_.Q_ = MatrixXd(4,4);
     ekf_.F_ = MatrixXd(4,4);
-    ekf_.P_ = MatrixXd(2,2);
-    ekf_.R_ = MatrixXd(2,2);
+    ekf_.P_ = MatrixXd(4,4);
     ekf_.Hj_= Hj_;
    
 
@@ -132,7 +131,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // TODO: Radar updates
-    
     // initialize jacobian matrix
     Hj_ = tools.CalculateJacobian(measurement_pack.raw_measurements_);
     ekf_.Hj_ = Hj_;
