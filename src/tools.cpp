@@ -42,7 +42,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
    * TODO:
    * Calculate a Jacobian here.
    */
-    std::cout << " Start .. Calculate Jacobian"  << std::endl;
+    
     
     MatrixXd Hj(3,4);
    // Read  measurements
@@ -59,11 +59,14 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
          return Hj;
 	}
 	
+     float c1 = sqrt(pow(px,2)+pow(py,2));
+     float c2 = pow(px,2)+pow(py,2);
+     float c3 = pow((pow(px,2)+pow(py,2)),1.5);
     // compute jacobian matrix for linearizing radar measurement
-    Hj << px/sqrt(pow(px,2)+pow(py,2)), py/sqrt(pow(px,2)+pow(py,2)), 0, 0,
-        -(py/(pow(px,2)+pow(py,2))),  px/(pow(px,2)+pow(py,2)),0,0,
-        (py*(vx*py-vy*px))/pow((pow(px,2)+pow(py,2)),1.5), px*(vy*px-vx*py)/pow((pow(px,2)+pow(py,2)),1.5), px/sqrt(pow(px,2)+pow(py,2)), py/sqrt(pow(px,2)+pow(py,2));
-std::cout << " Finish .. Calculate Jacobian"  << std::endl;
+    Hj << px/c1, py/c1, 0, 0,
+        -(py/c2),  px/c2,0,0,
+        (py*(vx*py-vy*px))/c3, px*(vy*px-vx*py)/c3, px/c1, py/c1;
+
 return Hj;
 }
 

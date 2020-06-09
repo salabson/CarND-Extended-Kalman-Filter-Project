@@ -46,6 +46,12 @@ class KalmanFilter {
    * @param z The measurement at k+1
    */
   void UpdateEKF(const Eigen::VectorXd &z);
+  
+  /**
+   * Commons operation used by laser and radar measurement update
+   * 
+   */
+  void CommonUpdateSteps(const Eigen::VectorXd &y);
  
   // tools class instance
   Tools tools;

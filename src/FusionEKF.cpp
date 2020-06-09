@@ -53,9 +53,7 @@ FusionEKF::FusionEKF() {
     ekf_.F_ = MatrixXd(4,4);
     
 
-    //ekf_.Hj_= Hj_;
-
-   cout << "Done initialzing" << endl;
+    
 
 }
 
@@ -91,13 +89,13 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     	double vx = x_state(2);
     	double vy = x_state(3);
 	ekf_.x_ << px, py, vx, vy;
-        cout << "Done converting from polar to cartetian... " << endl;
+        
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       // TODO: Initialize state.
      
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
-       cout << "Done initializ Laser... " << endl;
+       
     }
     // done initializing, no need to predict or update
     is_initialized_ = true;
@@ -126,18 +124,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
              0,1,0,dt,
              0,0,1,0,
              0,0,0,1;
-  // update process noise covariance matrix
-  ekf_.Q_ << (pow(dt,4)/4)*noise_ax, 0, (pow(dt,3)/2)*noise_ax, 0,
-            0, (pow(dt,4)/4)*noise_ay, 0, (pow(dt,3)/2)*noise_ax,
-            (pow(dt,3)/2)*noise_ax, 0, pow(dt,2)*noise_ax, 0,
-            0, (pow(dt,3)/2)*noise_ay, 0, pow(dt,2)*noise_ay;
+  
+// update process noise covariance matrix
+  float c1 = pow(dt,2);
+  float c2 = pow(dt,4)/4; 
+  float c3 = pow(dt,3)/2; 
+  ekf_.Q_ << c2*noise_ax, 0, c3*noise_ax, 0,
+            0, c2*noise_ay, 0, c3*noise_ax,
+            c3*noise_ax, 0, c1*noise_ax, 0,
+            0, c3*noise_ay, 0, c1*noise_ay;
 
  
    ekf_.Predict();
-   cout << "x_ = " << ekf_.x_ << endl;
-   cout << "P_ = " << ekf_.P_ << endl;
-   cout << "Done predicting... " << endl;
-   cout << "Radar measurementr" << measurement_pack.raw_measurements_ << endl;
+  
    
   /**
    * Update
@@ -156,28 +155,25 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
              
     // TODO: Radar updates
     // initialize jacobian matrix
-    cout << "start measurement R ... "<< endl;
+   
     
-    
-    cout << "Jacobian ... " << ekf_.Hj_ << endl;
     // Update radar measurement covariance
     ekf_.R_ = R_radar_;
-    cout << "R_radar_ ... " << ekf_.R_ << endl;
+    
     // update
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-    cout << "Done Measurement update Radar... " << endl;
+    
   } else {
     // TODO: Laser updates
-     ekf_.H_ = MatrixXd(2, 4);
+     
      ekf_.H_ = H_laser_;
      
     // Update laser measurement covariance
-    cout << "start measurement L ... "<< endl;
     ekf_.R_ = R_laser_;
-     cout << "R_laser_ ... " << ekf_.R_ << endl;
+     
     // update
     ekf_.Update(measurement_pack.raw_measurements_);
-    cout << "Done Measurement update Laser... " << endl;
+    
   }
 
   // print the output
