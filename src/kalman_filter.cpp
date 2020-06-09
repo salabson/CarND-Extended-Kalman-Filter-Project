@@ -60,10 +60,17 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
    * TODO: update the state by using Extended Kalman Filter equations
    */  
+   VectorXd polar_state = tools.FromCartesianToPolar(x_);
+   
   // Calculate measurement residual or error
-   VectorXd y = z - (H_*x_);
-   double normalizedrho =atan2(sin(y[1]),cos(y[1])); 
-   y[1] = normalizedrho;
+   VectorXd y = z - polar_state;
+   // Normalize angle
+   while(y(1) > M_PI){
+    y(1) -=2*M_PI; 
+   }
+   while(y(1) < -M_PI){
+    y(1) +=2*M_PI; 
+   }
    std::cout << "Measurement residual"<< y << std::endl;
    // Calculate Kalman filter denominator
    MatrixXd s = H_*P_*H_.transpose() + R_;
