@@ -47,10 +47,12 @@ void KalmanFilter::Update(const VectorXd &z) {
    MatrixXd K = P_*H_.transpose()*s.inverse();
    std::cout << "Kalman gain"<< K << std::endl;
   // Calculate posterior or new state
-   MatrixXd I = MatrixXd::Identity(2, 2);
+   MatrixXd I = MatrixXd::Identity(4, 4);
    std::cout << "Identity Matrix"<< I << std::endl;
-  x_= x_ + (K*y);
-  P_ = (I-K*H_)*P_;
+   std::cout << "x_"<< x_ << std::endl;
+   std::cout << "(K*y)"<< (K*y) << std::endl;
+   x_= x_ + (K*y);
+   P_ = (I-K*H_)*P_;
    
 }
 
@@ -59,19 +61,22 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    * TODO: update the state by using Extended Kalman Filter equations
    */  
   // Calculate measurement residual or error
-   VectorXd y = z - (Hj_*x_);
+   VectorXd y = z - (H_*x_);
+   double normalizedrho =atan2(sin(y[1]),cos(y[1])); 
+   y[1] = normalizedrho;
    std::cout << "Measurement residual"<< y << std::endl;
    // Calculate Kalman filter denominator
    MatrixXd s = H_*P_*H_.transpose() + R_;
    std::cout << "Kalman gain denominator"<< s << std::endl;
    // Calculate Kalman gain
-   std::cout << "Kalman gain denominator"<< s << std::endl;
    MatrixXd K = P_*H_.transpose()*s.inverse();
    std::cout << "Kalman gain"<< K << std::endl;
   // Calculate posterior or new state
-  MatrixXd I = MatrixXd::Identity(2, 2);
+  MatrixXd I = MatrixXd::Identity(4, 4);
   std::cout << "Identity Matrix"<< I << std::endl;
+  std::cout << "x_"<< x_ << std::endl;
   x_= x_ + K*y;
+  std::cout << "x_"<< x_ << std::endl;
   P_ = (I-K*H_)*P_;
 
 }
